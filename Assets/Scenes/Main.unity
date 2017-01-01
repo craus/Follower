@@ -1623,6 +1623,8 @@ MonoBehaviour:
   relativeVelocityDistance: 0
   penalty: 0
   recentSpeed: 0
+  minSpeed: -1
+  maxSpeed: 1000
   lastMouse: {x: 0, y: 0, z: 0, w: 0}
   secondLastMouse: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &2061998966
