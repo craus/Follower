@@ -79,7 +79,6 @@ public class Follower : MonoBehaviour {
 
     void Update() {
         time = Time.time;
-        RecalculateTrajectory();
         RecalculatePosition();
 	}
 
@@ -185,18 +184,28 @@ public class Follower : MonoBehaviour {
         RandomTrajectory(7);
     }
 
-    public void RandomTrajectory(int cnt) {
-        period = cnt;
-        RecalculateTrajectory();
+    public void RandomTrajectory(float cnt) {
+        int lowCnt = (int)cnt;
+        int highCnt = lowCnt + 1;
+        float upgradePart = cnt - lowCnt;
+        period = lowCnt;
         trajectoryTransform.Children().ForEach(c => c.Destroy());
-        for (int i = 0; i < cnt; i++) {
+        for (int i = 0; i < lowCnt; i++) {
             var tp = Instantiate(trajectoryPointPrefab);
             tp.transform.SetParent(trajectoryTransform);
             tp.transform.position = UnityEngine.Random.insideUnitCircle * 100;
-            tp.time = UnityEngine.Random.Range(0, period);
-            //tp.transform.position = new Vector2(Mathf.Cos(Mathf.PI * 2 * i / cnt), Mathf.Sin(Mathf.PI * 2 * i / cnt));
-            tp.time = period * i / cnt + period / cnt * 0.2f * UnityEngine.Random.Range(-1f, 1f);
+            tp.time = period * i / lowCnt + period / lowCnt * 0.2f * UnityEngine.Random.Range(-1f, 1f);
         }
+        RecalculateTrajectory();
+        trajectoryTransform.Children().ForEach(c => c.Destroy());
+        for (int i = 0; i < highCnt; i++) {
+            var tp = Instantiate(trajectoryPointPrefab);
+            tp.transform.SetParent(trajectoryTransform);
+            tp.time = period * i / highCnt + period / highCnt * 0.2f * UnityEngine.Random.Range(-1f, 1f);
+            tp.transform.position = Vector2.Lerp(Position(tp.time), UnityEngine.Random.insideUnitCircle * 100, upgradePart);
+        }
+        period = highCnt;
+
         FitToScreen();
         NormalizeSpeed();
     }

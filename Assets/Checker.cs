@@ -17,7 +17,7 @@ public class Checker : MonoBehaviour {
     public Slider slider;
     public Text scoreText;
     public float baseDistance = 8;
-    public int cnt = 4;
+    public float cnt = 4;
     public float targetSpeed = 3;
     public float minPeriodsRequired = 2;
     public Color bad;
@@ -28,18 +28,19 @@ public class Checker : MonoBehaviour {
     public float sqrNormalizedDistancePenalty = 1;
     public float sqrNormalizedVelocityDistancePenalty = 1;
     public float basePenalty = 1;
-    public Vector2 mouse;
-    public Vector2 mouseVelocity;
-    public float velocityDistance;
-    public float baseVelocityDistance;
-    public float relativeVelocityDistance;
-    public float penalty;
+    Vector2 mouse;
+    Vector2 mouseVelocity;
+    float velocityDistance;
+    float baseVelocityDistance;
+    float relativeVelocityDistance;
+    float penalty;
     public float recentSpeed;
-    public float minSpeed = -1;
-    public float maxSpeed = 1;
+    float minSpeed = -1;
+    float maxSpeed = 1;
+    float coloringMultiplier = 2;
 
-    public Vector4 lastMouse;
-    public Vector4 secondLastMouse;
+    Vector4 lastMouse;
+    Vector4 secondLastMouse;
 
     public Queue<Vector4> sliderValues = new Queue<Vector4>();
 
@@ -72,7 +73,7 @@ public class Checker : MonoBehaviour {
         if (sliderValues.Peek().w < Time.time) {
             recentSpeed = (slider.value - sliderValues.Peek().x) / (Time.time - sliderValues.Peek().w);
         }
-        sphereRenderer.material.SetColor("_EmissionColor", Color.Lerp(bad, good, (recentSpeed + 1) / 2));
+        sphereRenderer.material.SetColor("_EmissionColor", Color.Lerp(bad, good, (recentSpeed * coloringMultiplier + 1) / 2));
         scoreText.text = score.ToString();
 
         if (slider.value == 1) {
@@ -88,9 +89,9 @@ public class Checker : MonoBehaviour {
 
     private void NextLevel() {
         score++;
-        cnt = 2 + (int)(Math.Log(score, 2));
-        slider.value = 0;
-        follower.speed = targetSpeed;
+        cnt = 1.01f + Mathf.Log(score, 2);
+        slider.value = 0; 
+        follower.speed = targetSpeed; 
         follower.RandomTrajectory(cnt);
     }
 
