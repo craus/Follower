@@ -43,6 +43,11 @@ public class Follower : MonoBehaviour {
         return result;
     }
 
+    public Vector2 Velocity(float t) {
+        float dt = 1e-4f;
+        return (Position(t + dt) - Position(t)) / dt;
+    }
+
     public Vector2 SpookyPosition() {
         float[] prefixProducts = new float[trajectory.Count];
         prefixProducts[0] = Extensions.CyclicDiff(time, trajectory[0].time, period);
