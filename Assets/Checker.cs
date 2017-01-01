@@ -34,9 +34,12 @@ public class Checker : MonoBehaviour {
     public float baseVelocityDistance;
     public float relativeVelocityDistance;
     public float penalty;
+    public float recentSpeed;
 
     public Vector4 lastMouse;
     public Vector4 secondLastMouse;
+
+    public Queue<Vector4> sliderValues = new Queue<Vector4>();
 
     public void Update() {
         mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -60,8 +63,15 @@ public class Checker : MonoBehaviour {
         penalty = sqrNormalizedDistancePenalty * Mathf.Pow(relativeDistance, 2) + sqrNormalizedVelocityDistancePenalty * Mathf.Pow(relativeVelocityDistance, 2);
         float speed = (basePenalty - penalty) / basePenalty;
         distanceSphereRenderer.material.SetColor("_EmissionColor", Color.Lerp(bad, good, (speed + 1) / 2));
-        sphereRenderer.material.SetColor("_EmissionColor", Color.Lerp(bad, good, slider.value));
         slider.value += speed * Time.deltaTime / follower.period / minPeriodsRequired;
+        sliderValues.Enqueue(new Vector4(slider.value, 0, 0, Time.time));
+        while (sliderValues.Peek().w < Time.time - 0.1f) {
+            sliderValues.Dequeue();
+        }
+        if (sliderValues.Peek().w < Time.time) {
+            recentSpeed = (slider.value - sliderValues.Peek().x) / (Time.time - sliderValues.Peek().w);
+        }
+        sphereRenderer.material.SetColor("_EmissionColor", Color.Lerp(bad, good, (recentSpeed + 1) / 2));
         scoreText.text = score.ToString();
 
         if (slider.value == 1) {
