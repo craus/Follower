@@ -38,7 +38,7 @@ public class Follower : MonoBehaviour {
     public Vector2 Position(float t) {
         Vector2 result = Vector2.zero;
         for (int i = 0; i < trajectory.Count; i++) {
-            result += new Vector2((float)(ApproximationFunction(t*speed, i, false) * xApproximation[i]), (float)(ApproximationFunction(t*speed, i, true) * yApproximation[i]));
+            result += new Vector2((float)(ApproximationFunction(t, i, false) * xApproximation[i]), (float)(ApproximationFunction(t, i, true) * yApproximation[i]));
         }
         return result;
     }
@@ -134,7 +134,6 @@ public class Follower : MonoBehaviour {
     [ContextMenu("Fit to screen")]
     void FitToScreen() {
         RecalculateTrajectory();
-        Debug.LogFormat("trajectory = {0}", trajectory.ExtToString());
         Vector2 minPosition = Position(0);
         Vector2 maxPosition = Position(0);
         for (int i = 0; i < 1000; i++) {
@@ -150,13 +149,30 @@ public class Follower : MonoBehaviour {
         Vector2 desiredMaxPosition = Vector2.Max(a, b);
         desiredMinPosition += Vector2.one * radius;
         desiredMaxPosition -= Vector2.one * radius;
-        Vector2 zoom = (desiredMaxPosition - desiredMinPosition).Scaled((maxPosition - minPosition).Inverse());
+        Vector2 desiredSize = desiredMaxPosition - desiredMinPosition;
+        desiredSize = Vector2.one * Mathf.Min(desiredSize.x, desiredSize.y);
+        Vector2 zoom = desiredSize.Scaled((maxPosition - minPosition).Inverse());
         zoom = Vector2.one * Mathf.Min(zoom.x, zoom.y);
         Vector2 shift = (desiredMinPosition+desiredMaxPosition) - (minPosition+maxPosition).Scaled(zoom);
         shift /= 2;
-        Debug.LogFormat("zoom = {0}, shift = {1}", zoom.ExtToString(), shift.ExtToString());
         trajectory.ForEach(tp => tp.transform.position = tp.transform.position.xy().Scaled(zoom) + shift);
         RecalculateTrajectory();
+    }
+
+    public void NormalizeSpeed() {
+        RecalculateTrajectory();
+        float distance = 0;
+        for (int i = 0; i < 1000; i++) {
+            Vector2 position1 = Position(period * i / 1000);
+            Vector2 position2 = Position(period * (i+1) / 1000);
+            distance += (position2 - position1).magnitude;
+        }
+        float speed = distance / period;
+        float timeZoom = speed / this.speed;
+        period *= timeZoom;
+        for (int i = 0; i < trajectory.Count; i++) {
+            trajectory[i].time *= timeZoom;
+        }
     }
 
     [ContextMenu("Random trajectory")]
@@ -177,5 +193,6 @@ public class Follower : MonoBehaviour {
             tp.time = period * i / cnt + period / cnt * 0.2f * UnityEngine.Random.Range(-1f, 1f);
         }
         FitToScreen();
+        NormalizeSpeed();
     }
 }
