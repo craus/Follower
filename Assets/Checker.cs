@@ -35,6 +35,8 @@ public class Checker : MonoBehaviour {
     public float relativeVelocityDistance;
     public float penalty;
     public float recentSpeed;
+    public float minSpeed = -1;
+    public float maxSpeed = 1;
 
     public Vector4 lastMouse;
     public Vector4 secondLastMouse;
@@ -61,8 +63,7 @@ public class Checker : MonoBehaviour {
         distanceSphere.localScale = Vector2.one * distance * 2;
         float relativeDistance = distance / baseDistance;
         penalty = sqrNormalizedDistancePenalty * Mathf.Pow(relativeDistance, 2) + sqrNormalizedVelocityDistancePenalty * Mathf.Pow(relativeVelocityDistance, 2);
-        float speed = (basePenalty - penalty) / basePenalty;
-        distanceSphereRenderer.material.SetColor("_EmissionColor", Color.Lerp(bad, good, (speed + 1) / 2));
+        float speed = Mathf.Clamp((basePenalty - penalty) / basePenalty, minSpeed, maxSpeed);
         slider.value += speed * Time.deltaTime / follower.period / minPeriodsRequired;
         sliderValues.Enqueue(new Vector4(slider.value, 0, 0, Time.time));
         while (sliderValues.Peek().w < Time.time - 0.1f) {
@@ -75,10 +76,7 @@ public class Checker : MonoBehaviour {
         scoreText.text = score.ToString();
 
         if (slider.value == 1) {
-            score++;
-            cnt = 2 + (int)(Math.Log(score, 2));
             NextLevel();
-            slider.value = 0;
         }
     }
 
@@ -89,6 +87,9 @@ public class Checker : MonoBehaviour {
     }
 
     private void NextLevel() {
+        score++;
+        cnt = 2 + (int)(Math.Log(score, 2));
+        slider.value = 0;
         follower.speed = targetSpeed;
         follower.RandomTrajectory(cnt);
     }
