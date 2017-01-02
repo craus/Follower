@@ -3140,11 +3140,12 @@ MonoBehaviour:
   good: {r: 0, g: 1, b: 0, a: 0.484}
   score: 0
   minValuableVelocity: 3
-  sqrNormalizedDistancePenalty: 0
+  sqrNormalizedDistancePenalty: 0.6
   sqrNormalizedVelocityDistancePenalty: 1.5
-  basePenalty: 1.2
+  basePenalty: 1.8
   startDifficulty: 1.1
   difficultySpeed: 1
+  hideCursorTime: 1
 --- !u!1 &2061998966
 GameObject:
   m_ObjectHideFlags: 0
