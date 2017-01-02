@@ -3134,15 +3134,17 @@ MonoBehaviour:
   baseDistance: 1.4
   cnt: 5.5
   targetSpeed: 10
-  minPeriodsRequired: 2
+  minPeriodsRequired: 1
   bad: {r: 1, g: 0, b: 0, a: 0.51}
   normal: {r: 0, g: 0, b: 0, a: 0}
   good: {r: 0, g: 1, b: 0, a: 0.484}
   score: 0
   minValuableVelocity: 3
   sqrNormalizedDistancePenalty: 0
-  sqrNormalizedVelocityDistancePenalty: 1.4
-  basePenalty: 1.4
+  sqrNormalizedVelocityDistancePenalty: 1.5
+  basePenalty: 1.2
+  startDifficulty: 1.1
+  difficultySpeed: 1
 --- !u!1 &2061998966
 GameObject:
   m_ObjectHideFlags: 0

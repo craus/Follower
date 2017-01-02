@@ -38,6 +38,9 @@ public class Checker : MonoBehaviour {
     float maxSpeed = 1;
     float coloringMultiplier = 2f;
     float recentSpeed;
+    public float startDifficulty = 1.1f;
+    public float difficultySpeed = 1f;
+    public float hideCursorTime = 1f;
 
     Vector4 lastMouse;
     Vector4 secondLastMouse;
@@ -54,6 +57,11 @@ public class Checker : MonoBehaviour {
         if ((mouse - lastMouse.xy()) != Vector2.zero) {
             secondLastMouse = lastMouse;
             lastMouse = new Vector4(mouse.x, mouse.y, 0, Time.time);
+            Cursor.visible = true;
+        } else {
+            if (Time.time > lastMouse.w + hideCursorTime) {
+                Cursor.visible = false;
+            }
         }
         Vector2 targetVelocity = follower.Velocity(Time.time);
         velocityDistance = (targetVelocity - mouseVelocity).magnitude;
@@ -73,7 +81,7 @@ public class Checker : MonoBehaviour {
         if (sliderValues.Peek().w < Time.time) {
             recentSpeed = (slider.value - sliderValues.Peek().x) / (Time.time - sliderValues.Peek().w);
         }
-        sphereRenderer.material.SetColor("_EmissionColor", Color.Lerp(bad, good, (recentSpeed * coloringMultiplier + 1) / 2));
+        sphereRenderer.material.SetColor("_EmissionColor", Color.Lerp(bad, good, (recentSpeed * follower.period * minPeriodsRequired + 1) / 2));
         scoreText.text = score.ToString();
 
         if (slider.value == 1) {
@@ -89,7 +97,7 @@ public class Checker : MonoBehaviour {
 
     public void NextLevel() {
         score++;
-        cnt = 2.01f + Mathf.Log(score, 2);
+        cnt = startDifficulty + difficultySpeed * Mathf.Pow(score, 0.5f);
         slider.value = 0;
         follower.speed = targetSpeed; 
         RandomTrajectory();
