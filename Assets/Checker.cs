@@ -34,10 +34,10 @@ public class Checker : MonoBehaviour {
     float baseVelocityDistance;
     float relativeVelocityDistance;
     float penalty;
-    public float recentSpeed;
     float minSpeed = -1;
     float maxSpeed = 1;
-    float coloringMultiplier = 2;
+    float coloringMultiplier = 2f;
+    float recentSpeed;
 
     Vector4 lastMouse;
     Vector4 secondLastMouse;
@@ -87,11 +87,16 @@ public class Checker : MonoBehaviour {
         NextLevel();
     }
 
-    private void NextLevel() {
+    public void NextLevel() {
         score++;
-        cnt = 1.01f + Mathf.Log(score, 2);
-        slider.value = 0; 
+        cnt = 2.01f + Mathf.Log(score, 2);
+        slider.value = 0;
         follower.speed = targetSpeed; 
+        RandomTrajectory();
+    }
+
+    [ContextMenu("Random trajectory")]
+    public void RandomTrajectory() {
         follower.RandomTrajectory(cnt);
     }
 

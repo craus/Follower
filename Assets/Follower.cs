@@ -6,6 +6,7 @@ using SparseCollections;
 using System;
 using System.Linq;
 
+[ExecuteInEditMode]
 public class Follower : MonoBehaviour {
 
     public TrajectoryPoint trajectoryPointPrefab;
@@ -78,8 +79,13 @@ public class Follower : MonoBehaviour {
     }
 
     void Update() {
-        time = Time.time;
-        RecalculatePosition();
+        if (Extensions.Editor()) {
+            RecalculateTrajectory();
+            RecalculatePosition();
+        } else {
+            time = Time.time;
+            RecalculatePosition();
+        }
 	}
 
     void Start() {
@@ -148,7 +154,6 @@ public class Follower : MonoBehaviour {
         var corners = new Vector3[4];
         Vector2 a = Camera.main.ScreenToWorldPoint(trajectoryRect.TransformPoint(trajectoryRect.rect.min));
         Vector2 b = Camera.main.ScreenToWorldPoint(trajectoryRect.TransformPoint(trajectoryRect.rect.max));
-        Debug.LogFormat("corners: {0}, {1}", a, b);
         Vector2 desiredMinPosition = Vector2.Min(a, b);
         Vector2 desiredMaxPosition = Vector2.Max(a, b);
         desiredMinPosition += Vector2.one * radius;
@@ -188,6 +193,7 @@ public class Follower : MonoBehaviour {
         int lowCnt = (int)cnt;
         int highCnt = lowCnt + 1;
         float upgradePart = cnt - lowCnt;
+        upgradePart = 0;
         period = lowCnt;
         trajectoryTransform.Children().ForEach(c => c.Destroy());
         for (int i = 0; i < lowCnt; i++) {
@@ -197,14 +203,16 @@ public class Follower : MonoBehaviour {
             tp.time = period * i / lowCnt + period / lowCnt * 0.2f * UnityEngine.Random.Range(-1f, 1f);
         }
         RecalculateTrajectory();
-        trajectoryTransform.Children().ForEach(c => c.Destroy());
-        for (int i = 0; i < highCnt; i++) {
-            var tp = Instantiate(trajectoryPointPrefab);
-            tp.transform.SetParent(trajectoryTransform);
-            tp.time = period * i / highCnt + period / highCnt * 0.2f * UnityEngine.Random.Range(-1f, 1f);
-            tp.transform.position = Vector2.Lerp(Position(tp.time), UnityEngine.Random.insideUnitCircle * 100, upgradePart);
-        }
-        period = highCnt;
+        ////trajectoryTransform.Children().ForEach(c => c.Destroy());
+        ////for (int i = 0; i < highCnt; i++) {
+        ////    var tp = Instantiate(trajectoryPointPrefab);
+        ////    tp.transform.SetParent(trajectoryTransform);
+        ////    tp.time = period * i / highCnt + period / highCnt * 0.0f * UnityEngine.Random.Range(-1f, 1f);
+        ////    tp.transform.position = Vector2.Lerp(Position(tp.time), UnityEngine.Random.insideUnitCircle * 100, upgradePart);
+        ////    tp.transform.position = Position(tp.time);
+        ////    Debug.LogFormat("position = {0}", tp.transform.position);
+        ////}
+        //period = highCnt;
 
         FitToScreen();
         NormalizeSpeed();
