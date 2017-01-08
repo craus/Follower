@@ -34,7 +34,7 @@ public class Checker : MonoBehaviour {
     float baseVelocityDistance;
     float relativeVelocityDistance;
     float penalty;
-    float minSpeed = -1;
+    public float minSpeed = -1;
     float maxSpeed = 1;
     float coloringMultiplier = 2f;
     float recentSpeed;
@@ -93,6 +93,9 @@ public class Checker : MonoBehaviour {
         distanceSphereRenderer = distanceSphere.GetComponentInChildren<MeshRenderer>();
         sphereRenderer = target.GetComponentInChildren<MeshRenderer>();
         NextLevel();
+    }
+
+    void Save() {
     }
 
     public void NextLevel() {

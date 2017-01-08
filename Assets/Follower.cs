@@ -49,33 +49,9 @@ public class Follower : MonoBehaviour {
         return (Position(t + dt) - Position(t)) / dt;
     }
 
-    public Vector2 SpookyPosition() {
-        float[] prefixProducts = new float[trajectory.Count];
-        prefixProducts[0] = Extensions.CyclicDiff(time, trajectory[0].time, period);
-        for (int i = 1; i < trajectory.Count; i++) {
-            prefixProducts[i] = prefixProducts[i - 1] * Extensions.CyclicDiff(time, trajectory[i].time, period);
-        }
-
-        float[] suffixProducts = new float[trajectory.Count];
-        suffixProducts[trajectory.Count - 1] = Extensions.CyclicDiff(time, trajectory[trajectory.Count - 1].time, period);
-        for (int i = trajectory.Count-2; i >= 0; i--) {
-            suffixProducts[i] = suffixProducts[i + 1] * Extensions.CyclicDiff(time, trajectory[i].time, period);
-        }
-
-        float totalWeight = 0;
-        Vector3 totalPosition = Vector2.zero;
-        for (int i = 0; i < trajectory.Count; i++) {
-            float weight = 1;
-            if (i > 0) {
-                weight *= prefixProducts[i-1];
-            }
-            if (i < trajectory.Count-1) {
-                weight *= suffixProducts[i+1];
-            }
-            totalPosition += weight * trajectory[i].transform.position;
-            totalWeight += weight;
-        }
-        return totalPosition / totalWeight;
+    public Vector2 Acceleration(float t) {
+        float dt = 1e-4f;
+        return (Velocity(t + dt) - Velocity(t)) / dt;
     }
 
     void Update() {
@@ -87,9 +63,6 @@ public class Follower : MonoBehaviour {
             RecalculatePosition();
         }
 	}
-
-    void Start() {
-    }
 
     [ContextMenu("Recalculate Position")]
     void RecalculatePosition() {
